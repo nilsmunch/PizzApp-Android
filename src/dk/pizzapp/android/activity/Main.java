@@ -5,9 +5,10 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.TextView;
-import android.widget.ToggleButton;
+import android.view.ViewGroup;
+import android.widget.*;
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
@@ -15,14 +16,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.pizzapp.android.App;
 import dk.pizzapp.android.R;
 import dk.pizzapp.android.model.Response;
+import dk.pizzapp.android.model.Restaurant;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Main extends Activity {
-    ArrayList<ToggleButton> tabs = new ArrayList<ToggleButton>(6);
-    AQuery aQuery = new AQuery(this);
-    ProgressDialog progressDialog;
+    private HashMap<String, Restaurant> restaurants = new HashMap<String, Restaurant>();
+    private ArrayList<ToggleButton> tabs = new ArrayList<ToggleButton>(6);
+    private AQuery aQuery = new AQuery(this);
+    private ProgressDialog progressDialog;
+    private ListView list;
+    private MainListAdapter arrayAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,6 +38,13 @@ public class Main extends Activity {
         initProgressDialog();
         initActionBar();
         initTabs();
+        initList();
+    }
+
+    private void initList() {
+        arrayAdapter = new MainListAdapter();
+        list = (ListView) findViewById(R.id.main_list);
+        list.setAdapter(arrayAdapter);
     }
 
     private void initProgressDialog() {
@@ -59,6 +72,7 @@ public class Main extends Activity {
         }
 
         tabs.get(0).setChecked(true);
+        aQuery.progress(progressDialog).ajax("http://pizzapi.dk/zip/" + ((App) getApplication()).location.getPostalCode(), JSONObject.class, new responseCallback());
     }
 
     private class TabClickListener implements View.OnClickListener {
@@ -95,7 +109,7 @@ public class Main extends Activity {
             else {
                 try {
                     ObjectMapper objectMapper = new ObjectMapper();
-                    parseResponse(objectMapper.readValue(object.toString(), Response.class));
+                    handleResponse(objectMapper.readValue(object.toString(), Response.class));
                 } catch (Exception e) {
                     showAlert("", e.getMessage());
                 }
@@ -103,8 +117,10 @@ public class Main extends Activity {
         }
     }
 
-    private void parseResponse(Response response) {
-        showAlert("", response.getResult().get(response.getResult().keySet().iterator().next()).getName());
+    private void handleResponse(Response response) {
+        restaurants.clear();
+        restaurants.putAll(response.getResult());
+        arrayAdapter.notifyDataSetChanged();
     }
 
     private void showAlert(String title, String message) {
@@ -115,5 +131,51 @@ public class Main extends Activity {
                 dialogInterface.dismiss();
             }
         }).show();
+    }
+
+    private class MainListAdapter extends ArrayAdapter<Response> {
+
+        public MainListAdapter() {
+            super(Main.this, R.layout.main_list_item);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View row = convertView;
+            ListHolder holder = null;
+
+            if (row == null) {
+                LayoutInflater inflater = getLayoutInflater();
+                row = inflater.inflate(R.layout.main_list_item, parent, false);
+
+                holder = new ListHolder();
+                holder.icon = (ImageView) row.findViewById(R.id.list_item_icon);
+                holder.name = (TextView) row.findViewById(R.id.list_item_name);
+                holder.address = (TextView) row.findViewById(R.id.list_item_address);
+                holder.distance = (TextView) row.findViewById(R.id.list_item_distance);
+
+                row.setTag(holder);
+            } else {
+                holder = (ListHolder) row.getTag();
+            }
+
+            Restaurant restaurant = (Restaurant) restaurants.values().toArray()[position];
+            holder.name.setText(restaurant.getName());
+            holder.address.setText(restaurant.getAddress());
+
+            return row;
+        }
+
+        @Override
+        public int getCount() {
+            return restaurants.size();
+        }
+    }
+
+    static class ListHolder {
+        ImageView icon;
+        TextView name;
+        TextView address;
+        TextView distance;
     }
 }
