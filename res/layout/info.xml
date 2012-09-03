@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:orientation="vertical">
+    <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="46dp"
+            android:background="@drawable/actionbar_background">
+        <ImageView
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:layout_marginLeft="5dp"
+                android:padding="5dp"
+                android:src="@drawable/icon"/>
+        <TextView
+                android:id="@+id/info_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:paddingLeft="52dp"
+                android:paddingRight="52dp"
+                android:singleLine="true"
+                android:textColor="#FFF"
+                android:textSize="24dp"
+                android:text="Restaurant Name"
+                android:shadowColor="#000"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="2"/>
+    </RelativeLayout>
+    <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+        <com.google.android.maps.MapView
+                android:id="@+id/info_map"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"/>
+    </RelativeLayout>
+</LinearLayout>

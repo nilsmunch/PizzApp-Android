@@ -6,7 +6,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
@@ -151,21 +150,19 @@ public class Main extends Activity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            ListHolder holder = null;
+
+            ViewHolder holder;
 
             if (convertView == null) {
-                LayoutInflater inflater = getLayoutInflater();
-                convertView = inflater.inflate(R.layout.main_list_item, parent, false);
-
-                holder = new ListHolder();
+                convertView = getLayoutInflater().inflate(R.layout.main_list_item, parent, false);
+                holder = new ViewHolder();
                 holder.icon = (ImageView) convertView.findViewById(R.id.list_item_icon);
                 holder.name = (TextView) convertView.findViewById(R.id.list_item_name);
                 holder.address = (TextView) convertView.findViewById(R.id.list_item_address);
                 holder.distance = (TextView) convertView.findViewById(R.id.list_item_distance);
-
                 convertView.setTag(holder);
             } else {
-                holder = (ListHolder) convertView.getTag();
+                holder = (ViewHolder) convertView.getTag();
             }
 
             AQuery aq = new AQuery(convertView);
@@ -176,11 +173,11 @@ public class Main extends Activity {
             aq.id(holder.address).text(restaurant.getAddress());
 
             String imgUrl = "http://pizzapi.dk/display/" + restaurantId;
-            Bitmap placeholder = aq.getCachedImage(R.drawable.list_item_placeholder);
+            Bitmap placeholder = aq.getCachedImage(R.drawable.icon);
             if (aq.shouldDelay(position, convertView, parent, imgUrl))
-                aq.id(holder.icon).image(placeholder, 0.75f);
+                aq.id(holder.icon).image(placeholder);
             else
-                aq.id(holder.icon).image(imgUrl, true, true, 0, 0, placeholder, AQuery.FADE_IN_NETWORK, 0.75f);
+                aq.id(holder.icon).image(imgUrl, true, false, 0, 0, placeholder, AQuery.FADE_IN_NETWORK);
 
             return convertView;
         }
@@ -191,7 +188,7 @@ public class Main extends Activity {
         }
     }
 
-    static class ListHolder {
+    static class ViewHolder {
         ImageView icon;
         TextView name;
         TextView address;
