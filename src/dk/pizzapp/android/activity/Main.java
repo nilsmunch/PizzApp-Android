@@ -163,6 +163,9 @@ public class Main extends Activity {
             holder.name.setText(restaurant.getName());
             holder.address.setText(restaurant.getAddress());
 
+            String restaurantId = (String) restaurants.keySet().toArray()[position];
+            aQuery.id(holder.icon).image("http://pizzapi.dk/display/" + restaurantId);
+
             return row;
         }
 

@@ -1,4 +1,4 @@
 <resources>
-    <style name="Theme.Styled" parent="@android:style/Theme.Black.NoTitleBar">
+    <style name="Theme.Styled" parent="@android:style/Theme.Light.NoTitleBar">
     </style>
 </resources>
