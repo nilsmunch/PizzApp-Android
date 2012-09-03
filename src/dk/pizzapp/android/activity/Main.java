@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,7 +45,16 @@ public class Main extends Activity {
     private void initList() {
         arrayAdapter = new MainListAdapter();
         list = (ListView) findViewById(R.id.main_list);
-        list.setAdapter(arrayAdapter);
+        aQuery.id(list).scrolled(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int i) {
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int i, int i1, int i2) {
+            }
+        });
+        aQuery.id(list).adapter(arrayAdapter);
     }
 
     private void initProgressDialog() {
@@ -141,32 +151,38 @@ public class Main extends Activity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            View row = convertView;
             ListHolder holder = null;
 
-            if (row == null) {
+            if (convertView == null) {
                 LayoutInflater inflater = getLayoutInflater();
-                row = inflater.inflate(R.layout.main_list_item, parent, false);
+                convertView = inflater.inflate(R.layout.main_list_item, parent, false);
 
                 holder = new ListHolder();
-                holder.icon = (ImageView) row.findViewById(R.id.list_item_icon);
-                holder.name = (TextView) row.findViewById(R.id.list_item_name);
-                holder.address = (TextView) row.findViewById(R.id.list_item_address);
-                holder.distance = (TextView) row.findViewById(R.id.list_item_distance);
+                holder.icon = (ImageView) convertView.findViewById(R.id.list_item_icon);
+                holder.name = (TextView) convertView.findViewById(R.id.list_item_name);
+                holder.address = (TextView) convertView.findViewById(R.id.list_item_address);
+                holder.distance = (TextView) convertView.findViewById(R.id.list_item_distance);
 
-                row.setTag(holder);
+                convertView.setTag(holder);
             } else {
-                holder = (ListHolder) row.getTag();
+                holder = (ListHolder) convertView.getTag();
             }
 
+            AQuery aq = new AQuery(convertView);
             Restaurant restaurant = (Restaurant) restaurants.values().toArray()[position];
-            holder.name.setText(restaurant.getName());
-            holder.address.setText(restaurant.getAddress());
-
             String restaurantId = (String) restaurants.keySet().toArray()[position];
-            aQuery.id(holder.icon).image("http://pizzapi.dk/display/" + restaurantId);
 
-            return row;
+            aq.id(holder.name).text(restaurant.getName());
+            aq.id(holder.address).text(restaurant.getAddress());
+
+            String imgUrl = "http://pizzapi.dk/display/" + restaurantId;
+            Bitmap placeholder = aq.getCachedImage(R.drawable.list_item_placeholder);
+            if (aq.shouldDelay(position, convertView, parent, imgUrl))
+                aq.id(holder.icon).image(placeholder, 0.75f);
+            else
+                aq.id(holder.icon).image(imgUrl, true, true, 0, 0, placeholder, AQuery.FADE_IN_NETWORK, 0.75f);
+
+            return convertView;
         }
 
         @Override
