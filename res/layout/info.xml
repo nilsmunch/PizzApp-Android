@@ -33,9 +33,5 @@
     <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent">
-        <com.google.android.maps.MapView
-                android:id="@+id/info_map"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"/>
     </RelativeLayout>
 </LinearLayout>
