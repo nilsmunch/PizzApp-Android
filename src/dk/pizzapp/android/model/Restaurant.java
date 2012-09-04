@@ -3,16 +3,38 @@ package dk.pizzapp.android.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Restaurant {
-    @JsonProperty("type") private String type;
-    @JsonProperty("link") private String link;
-    @JsonProperty("name") private String name;
-    @JsonProperty("street") private String address;
-    @JsonProperty("city") private String city;
-    @JsonProperty("lat") private String latitude;
-    @JsonProperty("long") private String longitude;
-    @JsonProperty("keys") private String keys;
-    @JsonProperty("image") private String image;
-    @JsonProperty("phone") private String phone;
+    private String id;
+    @JsonProperty("type")
+    private String type;
+    @JsonProperty("link")
+    private String link;
+    @JsonProperty("name")
+    private String name;
+    @JsonProperty("street")
+    private String address;
+    @JsonProperty("city")
+    private String city;
+    @JsonProperty("long")
+    private String longitude;
+    @JsonProperty("lat")
+    private String latitude;
+    private float distance;
+    @JsonProperty("keys")
+    private String keys;
+    @JsonProperty("image")
+    private String image;
+    @JsonProperty("phone")
+    private String phone;
+    @JsonProperty("del_price")
+    private String delivery;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getType() {
         return type;
@@ -34,12 +56,20 @@ public class Restaurant {
         return city;
     }
 
+    public String getLongitude() {
+        return longitude;
+    }
+
     public String getLatitude() {
         return latitude;
     }
 
-    public String getLongitude() {
-        return longitude;
+    public float getDistance() {
+        return distance;
+    }
+
+    public void setDistance(float distance) {
+        this.distance = distance;
     }
 
     public String getKeys() {
@@ -52,5 +82,9 @@ public class Restaurant {
 
     public String getPhone() {
         return phone;
+    }
+
+    public String getDelivery() {
+        return delivery;
     }
 }

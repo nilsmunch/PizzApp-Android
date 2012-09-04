@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,10 +20,11 @@ import dk.pizzapp.android.model.Restaurant;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Map;
 
 public class Main extends Activity {
-    private HashMap<String, Restaurant> restaurants = new HashMap<String, Restaurant>();
     private ArrayList<ToggleButton> tabs = new ArrayList<ToggleButton>(6);
     private AQuery aQuery = new AQuery(this);
     private ProgressDialog progressDialog;
@@ -64,11 +65,13 @@ public class Main extends Activity {
     }
 
     private void initActionBar() {
-        ((TextView) findViewById(R.id.zipcode)).setText(((App) getApplication()).location.getPostalCode());
-        ((TextView) findViewById(R.id.main_description)).setText(((App) getApplication()).location.getAddressLine(0));
+        ((TextView) findViewById(R.id.zipcode)).setText(((App) getApplication()).address.getPostalCode());
+        ((TextView) findViewById(R.id.main_description)).setText(((App) getApplication()).address.getAddressLine(0));
     }
 
     private void initTabs() {
+
+        // Find all views and add them to tab-list
         tabs.add((ToggleButton) findViewById(R.id.main_tab_all));
         tabs.add((ToggleButton) findViewById(R.id.main_tab_pizza));
         tabs.add((ToggleButton) findViewById(R.id.main_tab_sushi));
@@ -76,12 +79,14 @@ public class Main extends Activity {
         tabs.add((ToggleButton) findViewById(R.id.main_tab_pasta));
         tabs.add((ToggleButton) findViewById(R.id.main_tab_sandwich));
 
+        // Set their onClick listener
         for (ToggleButton tab : tabs) {
             tab.setOnClickListener(new TabClickListener());
         }
 
+        // Check the first tab, and load "all" results
         tabs.get(0).setChecked(true);
-        aQuery.progress(progressDialog).ajax("http://pizzapi.dk/zip/" + ((App) getApplication()).location.getPostalCode(), JSONObject.class, new responseCallback());
+        aQuery.progress(progressDialog).ajax("http://pizzapi.dk/zip/" + ((App) getApplication()).address.getPostalCode(), JSONObject.class, new responseCallback());
     }
 
     private class TabClickListener implements View.OnClickListener {
@@ -96,17 +101,17 @@ public class Main extends Activity {
 
             // Call the webservice
             if (tabs.indexOf(view) == 0)
-                aQuery.progress(progressDialog).ajax("http://pizzapi.dk/zip/" + ((App) getApplication()).location.getPostalCode(), JSONObject.class, new responseCallback());
+                aQuery.progress(progressDialog).ajax("http://pizzapi.dk/zip/" + ((App) getApplication()).address.getPostalCode(), JSONObject.class, new responseCallback());
             else if (tabs.indexOf(view) == 1)
-                aQuery.progress(progressDialog).ajax("http://pizzapi.dk/desire/pizza/" + ((App) getApplication()).location.getPostalCode(), JSONObject.class, new responseCallback());
+                aQuery.progress(progressDialog).ajax("http://pizzapi.dk/desire/pizza/" + ((App) getApplication()).address.getPostalCode(), JSONObject.class, new responseCallback());
             else if (tabs.indexOf(view) == 2)
-                aQuery.progress(progressDialog).ajax("http://pizzapi.dk/desire/sushi/" + ((App) getApplication()).location.getPostalCode(), JSONObject.class, new responseCallback());
+                aQuery.progress(progressDialog).ajax("http://pizzapi.dk/desire/sushi/" + ((App) getApplication()).address.getPostalCode(), JSONObject.class, new responseCallback());
             else if (tabs.indexOf(view) == 3)
-                aQuery.progress(progressDialog).ajax("http://pizzapi.dk/desire/burger/" + ((App) getApplication()).location.getPostalCode(), JSONObject.class, new responseCallback());
+                aQuery.progress(progressDialog).ajax("http://pizzapi.dk/desire/burger/" + ((App) getApplication()).address.getPostalCode(), JSONObject.class, new responseCallback());
             else if (tabs.indexOf(view) == 4)
-                aQuery.progress(progressDialog).ajax("http://pizzapi.dk/desire/pasta/" + ((App) getApplication()).location.getPostalCode(), JSONObject.class, new responseCallback());
+                aQuery.progress(progressDialog).ajax("http://pizzapi.dk/desire/pasta/" + ((App) getApplication()).address.getPostalCode(), JSONObject.class, new responseCallback());
             else if (tabs.indexOf(view) == 5)
-                aQuery.progress(progressDialog).ajax("http://pizzapi.dk/desire/sandwich/" + ((App) getApplication()).location.getPostalCode(), JSONObject.class, new responseCallback());
+                aQuery.progress(progressDialog).ajax("http://pizzapi.dk/desire/sandwich/" + ((App) getApplication()).address.getPostalCode(), JSONObject.class, new responseCallback());
         }
     }
 
@@ -127,9 +132,31 @@ public class Main extends Activity {
     }
 
     private void handleResponse(Response response) {
-        restaurants.clear();
-        restaurants.putAll(response.getResult());
+        for (Map.Entry<String, Restaurant> entry : response.getResult().entrySet()) {
+
+            // Set the id for the restaurant
+            entry.getValue().setId(entry.getKey());
+
+            // Calculate and set distance from current location
+            float[] distances = new float[3];
+            Location.distanceBetween(
+                    ((App) getApplication()).location.getLatitude(), ((App) getApplication()).location.getLongitude(),
+                    Double.parseDouble(entry.getValue().getLatitude()), Double.parseDouble(entry.getValue().getLongitude()),
+                    distances);
+            entry.getValue().setDistance(distances[0]);
+
+        }
+
+        // Clear existing results and add new ones
+        ((App) getApplication()).restaurants.clear();
+        ((App) getApplication()).restaurants.addAll(response.getResult().values());
+
+        // Sort the results according to distance
+        Collections.sort(((App) getApplication()).restaurants, new DistanceComparator());
+
+        // Update the list with the new results
         arrayAdapter.notifyDataSetChanged();
+        list.setSelectionAfterHeaderView();
     }
 
     private void showAlert(String title, String message) {
@@ -154,7 +181,7 @@ public class Main extends Activity {
             ViewHolder holder;
 
             if (convertView == null) {
-                convertView = getLayoutInflater().inflate(R.layout.main_list_item, parent, false);
+                convertView = getLayoutInflater().inflate(R.layout.main_list_item, null);
                 holder = new ViewHolder();
                 holder.icon = (ImageView) convertView.findViewById(R.id.list_item_icon);
                 holder.name = (TextView) convertView.findViewById(R.id.list_item_name);
@@ -165,26 +192,30 @@ public class Main extends Activity {
                 holder = (ViewHolder) convertView.getTag();
             }
 
-            AQuery aq = new AQuery(convertView);
-            Restaurant restaurant = (Restaurant) restaurants.values().toArray()[position];
-            String restaurantId = (String) restaurants.keySet().toArray()[position];
+            Restaurant restaurant = ((App) getApplication()).restaurants.get(position);
 
+            AQuery aq = new AQuery(convertView);
             aq.id(holder.name).text(restaurant.getName());
             aq.id(holder.address).text(restaurant.getAddress());
 
-            String imgUrl = "http://pizzapi.dk/display/" + restaurantId;
-            Bitmap placeholder = aq.getCachedImage(R.drawable.icon);
-            if (aq.shouldDelay(position, convertView, parent, imgUrl))
-                aq.id(holder.icon).image(placeholder);
-            else
-                aq.id(holder.icon).image(imgUrl, true, false, 0, 0, placeholder, AQuery.FADE_IN_NETWORK);
+            aq.id(holder.icon).image(
+                    "http://pizzapi.dk/display/" + restaurant.getId(),
+                    true, false, 0,
+                    R.drawable.icon, aq.getCachedImage(R.drawable.icon),
+                    AQuery.FADE_IN_NETWORK);
+
+            if ((int) restaurant.getDistance() < 1000)
+                aq.id(holder.distance).text((int) restaurant.getDistance() + " m");
+            else {
+                aq.id(holder.distance).text((int) restaurant.getDistance() / 1000 + " km");
+            }
 
             return convertView;
         }
 
         @Override
         public int getCount() {
-            return restaurants.size();
+            return ((App) getApplication()).restaurants.size();
         }
     }
 
@@ -193,5 +224,13 @@ public class Main extends Activity {
         TextView name;
         TextView address;
         TextView distance;
+    }
+
+    private class DistanceComparator implements Comparator<Restaurant> {
+
+        @Override
+        public int compare(Restaurant restaurant, Restaurant restaurant1) {
+            return Float.compare(restaurant.getDistance(), restaurant1.getDistance());
+        }
     }
 }

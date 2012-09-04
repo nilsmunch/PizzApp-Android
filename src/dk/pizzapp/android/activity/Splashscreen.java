@@ -33,7 +33,8 @@ public class Splashscreen extends Activity implements LocationListener {
             List<Address> addressList = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
             Address address = addressList.get(0);
 
-            ((App)(getApplication())).location = address;
+            ((App) (getApplication())).location = location;
+            ((App) (getApplication())).address = address;
 
             startActivity(new Intent(Splashscreen.this, Main.class));
             finish();
