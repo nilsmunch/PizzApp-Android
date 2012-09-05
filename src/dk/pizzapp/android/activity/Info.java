@@ -1,6 +1,7 @@
 package dk.pizzapp.android.activity;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -40,9 +41,24 @@ public class Info extends MapActivity {
         return false;
     }
 
+    public boolean isAppInstalled(String uri) {
+        PackageManager pm = getPackageManager();
+        boolean app_installed = false;
+        try {
+            pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
+            app_installed = true;
+        } catch (PackageManager.NameNotFoundException e) {
+            app_installed = false;
+        }
+        return app_installed;
+    }
+
     public void findRoute(View v) {
         Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-                Uri.parse("http://maps.google.com/maps?saddr=20.344,34.34&daddr=20.5666,45.345"));
+                Uri.parse("geo:0,0?q=" + restaurant.getAddress() + ", " + restaurant.getCity()));
+        if (isAppInstalled("com.google.android.apps.maps"))
+            intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+        startActivity(intent);
     }
 
     public void doOrder(View v) {

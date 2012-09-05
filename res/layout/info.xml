@@ -67,6 +67,7 @@
                         android:layout_height="wrap_content"
                         android:padding="5dp"
                         android:scaleType="fitEnd"
+                        android:onClick="findRoute"
                         android:src="@drawable/info_button_route"/>
                 <ImageView
                         android:layout_width="0dp"
@@ -74,6 +75,7 @@
                         android:layout_height="wrap_content"
                         android:padding="5dp"
                         android:scaleType="fitEnd"
+                        android:onClick="doOrder"
                         android:src="@drawable/info_button_order"/>
             </LinearLayout>
         </LinearLayout>
