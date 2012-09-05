@@ -13,6 +13,9 @@
                  android:label="PizzApp"
                  android:icon="@drawable/icon"
                  android:theme="@style/Theme.Styled">
+
+        <uses-library android:name="com.google.android.maps"/>
+
         <activity android:name=".activity.Splashscreen"
                   android:label="PizzApp"
                   android:screenOrientation="portrait">
@@ -21,8 +24,10 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
         <activity android:name=".activity.Main"
                   android:screenOrientation="portrait"/>
+
         <activity android:name=".activity.Info"
                   android:screenOrientation="portrait"/>
     </application>
