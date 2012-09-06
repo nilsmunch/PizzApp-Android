@@ -24,13 +24,14 @@ public class Order extends Activity {
 
         webView = (WebView) findViewById(R.id.order_webview);
         webView.setWebViewClient(new WebClient());
+        webView.getSettings().setJavaScriptEnabled(true);
         webView.loadUrl("http://pizzapi.dk/go/" + restaurant.getId());
     }
 
     private class WebClient extends WebViewClient {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            return false;
+            return super.shouldOverrideUrlLoading(view, url);
         }
     }
 
