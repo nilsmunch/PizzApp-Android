@@ -11,6 +11,7 @@ public class App extends Application {
     public Location location = null;
     public Address address = null;
     public ArrayList<Restaurant> restaurants = new ArrayList<Restaurant>();
+    public ArrayList<Restaurant> visibleRestaurants = new ArrayList<Restaurant>();
 
     @Override
     public void onCreate() {

@@ -26,11 +26,11 @@ import java.util.Comparator;
 import java.util.Map;
 
 public class Main extends Activity {
-    private ArrayList<ToggleButton> tabs = new ArrayList<ToggleButton>(6);
+    private ArrayList<ToggleButton> tabs = new ArrayList<ToggleButton>();
     private AQuery aQuery = new AQuery(this);
     private ProgressDialog progressDialog;
-    private ListView list;
     private MainListAdapter arrayAdapter;
+    private ListView list;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -100,19 +100,18 @@ public class Main extends Activity {
                 tab.setChecked(false);
             ((ToggleButton) view).setChecked(true);
 
-            // Call the webservice
-            if (tabs.indexOf(view) == 0)
-                aQuery.progress(progressDialog).ajax("http://pizzapi.dk/zip/" + ((App) getApplication()).address.getPostalCode(), JSONObject.class, new responseCallback());
-            else if (tabs.indexOf(view) == 1)
-                aQuery.progress(progressDialog).ajax("http://pizzapi.dk/desire/pizza/" + ((App) getApplication()).address.getPostalCode(), JSONObject.class, new responseCallback());
-            else if (tabs.indexOf(view) == 2)
-                aQuery.progress(progressDialog).ajax("http://pizzapi.dk/desire/sushi/" + ((App) getApplication()).address.getPostalCode(), JSONObject.class, new responseCallback());
-            else if (tabs.indexOf(view) == 3)
-                aQuery.progress(progressDialog).ajax("http://pizzapi.dk/desire/burger/" + ((App) getApplication()).address.getPostalCode(), JSONObject.class, new responseCallback());
-            else if (tabs.indexOf(view) == 4)
-                aQuery.progress(progressDialog).ajax("http://pizzapi.dk/desire/pasta/" + ((App) getApplication()).address.getPostalCode(), JSONObject.class, new responseCallback());
-            else if (tabs.indexOf(view) == 5)
-                aQuery.progress(progressDialog).ajax("http://pizzapi.dk/desire/sandwich/" + ((App) getApplication()).address.getPostalCode(), JSONObject.class, new responseCallback());
+            // Filter the visible results according to the tag
+            ((App) getApplication()).visibleRestaurants.clear();
+            String tag = ((ToggleButton) view).getTextOn().toString();
+            if (tag.equalsIgnoreCase("all"))
+                ((App) getApplication()).visibleRestaurants.addAll(((App) getApplication()).restaurants);
+            else
+                for (Restaurant restaurant : ((App) getApplication()).restaurants) {
+                    if (restaurant.getKeys().contains(tag.toLowerCase()))
+                        ((App) getApplication()).visibleRestaurants.add(restaurant);
+                }
+            arrayAdapter.notifyDataSetChanged();
+            list.setSelectionAfterHeaderView();
         }
     }
 
@@ -156,6 +155,7 @@ public class Main extends Activity {
         Collections.sort(((App) getApplication()).restaurants, new DistanceComparator());
 
         // Update the list with the new results
+        ((App) getApplication()).visibleRestaurants.addAll(((App) getApplication()).restaurants);
         arrayAdapter.notifyDataSetChanged();
         list.setSelectionAfterHeaderView();
     }
@@ -193,7 +193,7 @@ public class Main extends Activity {
                 holder = (ViewHolder) convertView.getTag();
             }
 
-            Restaurant restaurant = ((App) getApplication()).restaurants.get(position);
+            Restaurant restaurant = ((App) getApplication()).visibleRestaurants.get(position);
 
             AQuery aq = new AQuery(convertView);
             holder.id = position;
@@ -220,7 +220,7 @@ public class Main extends Activity {
 
         @Override
         public int getCount() {
-            return ((App) getApplication()).restaurants.size();
+            return ((App) getApplication()).visibleRestaurants.size();
         }
     }
 

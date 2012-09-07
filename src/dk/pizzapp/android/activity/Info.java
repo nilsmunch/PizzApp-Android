@@ -28,7 +28,7 @@ public class Info extends MapActivity {
         setContentView(R.layout.info);
 
         // Get the restaurant and mapview
-        restaurant = ((App) getApplication()).restaurants.get(getIntent().getIntExtra("id", 0));
+        restaurant = ((App) getApplication()).visibleRestaurants.get(getIntent().getIntExtra("id", 0));
         mapView = (MapView) findViewById(R.id.info_map);
 
         // Set the text fields

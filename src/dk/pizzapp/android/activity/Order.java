@@ -22,7 +22,7 @@ public class Order extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.order);
 
-        restaurant = ((App) getApplication()).restaurants.get(getIntent().getIntExtra("id", 0));
+        restaurant = ((App) getApplication()).visibleRestaurants.get(getIntent().getIntExtra("id", 0));
         ((TextView) findViewById(R.id.order_name)).setText(restaurant.getName());
 
         progressBar = (ProgressBar) findViewById(R.id.order_progress);
