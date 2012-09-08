@@ -1,61 +1,52 @@
-package dk.pizzapp.android.activity;
+package dk.pizzapp.android.activity.main;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.AbsListView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.ToggleButton;
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.pizzapp.android.App;
 import dk.pizzapp.android.R;
-import dk.pizzapp.android.model.Response;
-import dk.pizzapp.android.model.Restaurant;
+import dk.pizzapp.android.data.Response;
+import dk.pizzapp.android.data.Restaurant;
+import dk.pizzapp.android.util.DistanceComparator;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Map;
 
-public class Main extends Activity {
+public class MainActivity extends Activity {
     private ArrayList<ToggleButton> tabs = new ArrayList<ToggleButton>();
+    private MainListAdapter listAdapter;
     private AQuery aQuery = new AQuery(this);
     private ProgressDialog progressDialog;
-    private MainListAdapter arrayAdapter;
     private ListView list;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.activity_main);
 
-        initProgressDialog();
         initActionBar();
+        initProgressDialog();
         initTabs();
         initList();
     }
 
-    private void initList() {
-        arrayAdapter = new MainListAdapter();
-        list = (ListView) findViewById(R.id.main_list);
-        aQuery.id(list).scrolled(new AbsListView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(AbsListView absListView, int i) {
-            }
-
-            @Override
-            public void onScroll(AbsListView absListView, int i, int i1, int i2) {
-            }
-        });
-        aQuery.id(list).adapter(arrayAdapter);
+    private void initActionBar() {
+        ((TextView) findViewById(R.id.zipcode)).setText(App.address.getPostalCode());
+        ((TextView) findViewById(R.id.main_description)).setText(App.address.getAddressLine(0));
     }
 
     private void initProgressDialog() {
@@ -63,11 +54,6 @@ public class Main extends Activity {
         progressDialog.setIndeterminate(true);
         progressDialog.setCancelable(false);
         progressDialog.setMessage("Loading..");
-    }
-
-    private void initActionBar() {
-        ((TextView) findViewById(R.id.zipcode)).setText(App.address.getPostalCode());
-        ((TextView) findViewById(R.id.main_description)).setText(App.address.getAddressLine(0));
     }
 
     private void initTabs() {
@@ -85,9 +71,26 @@ public class Main extends Activity {
             tab.setOnClickListener(new TabClickListener());
         }
 
-        // Check the first tab, and load "all" results
+        // Check the first tab, and load initial results
         tabs.get(0).setChecked(true);
         aQuery.progress(progressDialog).ajax("http://pizzapi.dk/zip/" + App.address.getPostalCode(), JSONObject.class, new responseCallback());
+    }
+
+    private void initList() {
+        list = (ListView) findViewById(R.id.main_list);
+        listAdapter = new MainListAdapter(this);
+        aQuery.id(list).scrolled(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int i) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int i, int i1, int i2) {
+
+            }
+        });
+        aQuery.id(list).adapter(listAdapter);
     }
 
     private class TabClickListener implements View.OnClickListener {
@@ -110,7 +113,7 @@ public class Main extends Activity {
                     if (restaurant.getKeys().contains(tag.toLowerCase()))
                         App.visibleRestaurants.add(restaurant);
                 }
-            arrayAdapter.notifyDataSetChanged();
+            listAdapter.notifyDataSetChanged();
             list.setSelectionAfterHeaderView();
         }
     }
@@ -156,7 +159,7 @@ public class Main extends Activity {
 
         // Update the list with the new results
         App.visibleRestaurants.addAll(App.restaurants);
-        arrayAdapter.notifyDataSetChanged();
+        listAdapter.notifyDataSetChanged();
         list.setSelectionAfterHeaderView();
     }
 
@@ -168,76 +171,5 @@ public class Main extends Activity {
                 dialogInterface.dismiss();
             }
         }).show();
-    }
-
-    private class MainListAdapter extends ArrayAdapter<Response> {
-
-        public MainListAdapter() {
-            super(Main.this, R.layout.main_list_item);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-
-            ViewHolder holder;
-
-            if (convertView == null) {
-                convertView = getLayoutInflater().inflate(R.layout.main_list_item, null);
-                holder = new ViewHolder();
-                holder.icon = (ImageView) convertView.findViewById(R.id.list_item_icon);
-                holder.name = (TextView) convertView.findViewById(R.id.list_item_name);
-                holder.address = (TextView) convertView.findViewById(R.id.list_item_address);
-                holder.distance = (TextView) convertView.findViewById(R.id.list_item_distance);
-                convertView.setTag(holder);
-            } else {
-                holder = (ViewHolder) convertView.getTag();
-            }
-
-            Restaurant restaurant = App.visibleRestaurants.get(position);
-
-            AQuery aq = new AQuery(convertView);
-            holder.id = position;
-            aq.id(holder.name).text(restaurant.getName());
-            aq.id(holder.address).text(restaurant.getAddress());
-            aq.id(holder.icon).image("http://pizzapi.dk/display/" + restaurant.getId(), true, false, 0, R.drawable.icon, aq.getCachedImage(R.drawable.icon), AQuery.FADE_IN_NETWORK);
-
-            if ((int) restaurant.getDistance() < 1000)
-                aq.id(holder.distance).text((int) restaurant.getDistance() + " m");
-            else {
-                aq.id(holder.distance).text((int) restaurant.getDistance() / 1000 + " km");
-            }
-
-            convertView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    ViewHolder viewHolder = (ViewHolder) view.getTag();
-                    App.restaurant = App.visibleRestaurants.get(viewHolder.id);
-                    startActivity(new Intent(Main.this, Info.class));
-                }
-            });
-
-            return convertView;
-        }
-
-        @Override
-        public int getCount() {
-            return App.visibleRestaurants.size();
-        }
-    }
-
-    static class ViewHolder {
-        int id;
-        ImageView icon;
-        TextView name;
-        TextView address;
-        TextView distance;
-    }
-
-    // Compares the distance differences between the restaurants
-    private class DistanceComparator implements Comparator<Restaurant> {
-        @Override
-        public int compare(Restaurant restaurant, Restaurant restaurant1) {
-            return Float.compare(restaurant.getDistance(), restaurant1.getDistance());
-        }
     }
 }

@@ -3,7 +3,7 @@ package dk.pizzapp.android;
 import android.app.Application;
 import android.location.Address;
 import android.location.Location;
-import dk.pizzapp.android.model.Restaurant;
+import dk.pizzapp.android.data.Restaurant;
 
 import java.util.ArrayList;
 

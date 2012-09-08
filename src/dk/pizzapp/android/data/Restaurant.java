@@ -1,9 +1,10 @@
-package dk.pizzapp.android.model;
+package dk.pizzapp.android.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Restaurant {
     private String id;
+    private float distance;
     @JsonProperty("type")
     private String type;
     @JsonProperty("link")
@@ -18,7 +19,6 @@ public class Restaurant {
     private String longitude;
     @JsonProperty("lat")
     private String latitude;
-    private float distance;
     @JsonProperty("keys")
     private String keys;
     @JsonProperty("image")
@@ -34,6 +34,14 @@ public class Restaurant {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public float getDistance() {
+        return distance;
+    }
+
+    public void setDistance(float distance) {
+        this.distance = distance;
     }
 
     public String getType() {
@@ -62,14 +70,6 @@ public class Restaurant {
 
     public String getLatitude() {
         return latitude;
-    }
-
-    public float getDistance() {
-        return distance;
-    }
-
-    public void setDistance(float distance) {
-        this.distance = distance;
     }
 
     public String getKeys() {

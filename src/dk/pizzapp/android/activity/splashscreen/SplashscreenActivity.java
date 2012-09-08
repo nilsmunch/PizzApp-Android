@@ -1,4 +1,4 @@
-package dk.pizzapp.android.activity;
+package dk.pizzapp.android.activity.splashscreen;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -10,14 +10,14 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import dk.pizzapp.android.R;
 
-public class Splashscreen extends Activity {
+public class SplashscreenActivity extends Activity {
     private LocationManager locationManager;
     private SplashscreenLocationListener locationListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.splashscreen);
+        setContentView(R.layout.activity_splashscreen);
 
         // Get the location manager
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);

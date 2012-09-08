@@ -11,14 +11,15 @@
     <application android:name=".App" android:label="PizzApp" android:icon="@drawable/icon"
                  android:theme="@style/Theme.Styled">
         <uses-library android:name="com.google.android.maps"/>
-        <activity android:name=".activity.Splashscreen" android:label="PizzApp" android:screenOrientation="portrait">
+        <activity android:name=".activity.splashscreen.SplashscreenActivity" android:label="PizzApp"
+                  android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".activity.Main" android:screenOrientation="portrait"/>
-        <activity android:name=".activity.Info" android:screenOrientation="portrait"/>
-        <activity android:name=".activity.Order" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.main.MainActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.info.InfoActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.order.OrderActivity" android:screenOrientation="portrait"/>
     </application>
 </manifest> 

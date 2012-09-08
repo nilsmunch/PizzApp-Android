@@ -7,7 +7,7 @@
     <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="46dp"
-            android:background="@drawable/actionbar_background">
+            android:background="@drawable/background_actionbar">
         <ImageView
                 android:layout_width="46dp"
                 android:layout_height="46dp"
@@ -29,14 +29,6 @@
                 android:shadowDx="1"
                 android:shadowDy="1"
                 android:shadowRadius="2"/>
-        <ProgressBar
-                android:id="@+id/order_progress"
-                android:layout_width="46dp"
-                android:layout_height="46dp"
-                android:layout_alignParentRight="true"
-                android:padding="5dp"
-                android:visibility="invisible"
-                android:indeterminate="true"/>
     </RelativeLayout>
     <WebView
             android:id="@+id/order_webview"

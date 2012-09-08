@@ -7,7 +7,7 @@
     <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="46dp"
-            android:background="@drawable/actionbar_background">
+            android:background="@drawable/background_actionbar">
         <ImageView
                 android:layout_width="46dp"
                 android:layout_height="46dp"
@@ -60,23 +60,23 @@
             <LinearLayout
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/info_background">
+                    android:background="@drawable/background_info">
                 <ImageView
+                        android:id="@+id/info_route"
                         android:layout_width="0dp"
                         android:layout_weight="0.5"
                         android:layout_height="wrap_content"
                         android:padding="5dp"
                         android:scaleType="fitEnd"
-                        android:onClick="findRoute"
-                        android:src="@drawable/info_button_route"/>
+                        android:src="@drawable/button_route"/>
                 <ImageView
+                        android:id="@+id/info_order"
                         android:layout_width="0dp"
                         android:layout_weight="0.5"
                         android:layout_height="wrap_content"
                         android:padding="5dp"
                         android:scaleType="fitEnd"
-                        android:onClick="doOrder"
-                        android:src="@drawable/info_button_order"/>
+                        android:src="@drawable/button_order"/>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

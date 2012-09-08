@@ -1,4 +1,4 @@
-package dk.pizzapp.android.activity;
+package dk.pizzapp.android.activity.info;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,28 +16,50 @@ import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import dk.pizzapp.android.App;
 import dk.pizzapp.android.R;
+import dk.pizzapp.android.activity.order.OrderActivity;
 
-public class Info extends MapActivity {
+public class InfoActivity extends MapActivity {
     private MapView mapView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.info);
+        setContentView(R.layout.activity_info);
 
-        // Get the mapview
-        mapView = (MapView) findViewById(R.id.info_map);
+        initUi();
+        initMap();
+    }
+
+    private void initUi() {
 
         // Set the text fields
         ((TextView) findViewById(R.id.info_name)).setText(App.restaurant.getName());
         ((TextView) findViewById(R.id.info_address)).setText(App.restaurant.getAddress() + ", " + App.restaurant.getCity());
 
+        // Set the button listeners
+        findViewById(R.id.info_route).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                findRoute();
+            }
+        });
+        findViewById(R.id.info_order).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                doOrder();
+            }
+        });
+    }
+
+    private void initMap() {
+
+        // Get the mapview
+        mapView = (MapView) findViewById(R.id.info_map);
+
         // Set the map center and zoom to the restaurants locations
-        mapView.getController().setCenter(
-                new GeoPoint(
-                        (int) (Double.parseDouble(App.restaurant.getLatitude()) * 1E6),
-                        (int) (Double.parseDouble(App.restaurant.getLongitude()) * 1E6))
-        );
+        mapView.getController().setCenter(new GeoPoint(
+                (int) (Double.parseDouble(App.restaurant.getLatitude()) * 1E6),
+                (int) (Double.parseDouble(App.restaurant.getLongitude()) * 1E6)));
         mapView.getController().setZoom(18);
 
         // Add a map marker
@@ -59,7 +81,7 @@ public class Info extends MapActivity {
                     (int) (Double.parseDouble(App.restaurant.getLongitude()) * 1E6))
                     , screenPoint);
 
-            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.marker);
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.map_marker);
             canvas.drawBitmap(bitmap, screenPoint.x, screenPoint.y - bitmap.getHeight(), null);
         }
 
@@ -83,7 +105,7 @@ public class Info extends MapActivity {
         return app_installed;
     }
 
-    public void findRoute(View v) {
+    public void findRoute() {
         Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
                 Uri.parse("geo:0,0?q=" + App.restaurant.getAddress() + ", " + App.restaurant.getCity()));
         if (isAppInstalled("com.google.android.apps.maps"))
@@ -91,7 +113,7 @@ public class Info extends MapActivity {
         startActivity(intent);
     }
 
-    public void doOrder(View v) {
-        startActivity(new Intent(Info.this, Order.class).putExtra("id", getIntent().getIntExtra("id", 0)));
+    public void doOrder() {
+        startActivity(new Intent(InfoActivity.this, OrderActivity.class));
     }
 }

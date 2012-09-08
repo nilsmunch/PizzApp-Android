@@ -1,4 +1,4 @@
-package dk.pizzapp.android.activity;
+package dk.pizzapp.android.activity.splashscreen;
 
 import android.app.Activity;
 import android.content.Context;
@@ -11,6 +11,7 @@ import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 import dk.pizzapp.android.App;
+import dk.pizzapp.android.activity.main.MainActivity;
 
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +46,7 @@ public class SplashscreenLocationListener implements LocationListener {
             if (!isDeviceRegistered())
                 registerDevice();
             else {
-                activity.startActivity(new Intent(activity, Main.class));
+                activity.startActivity(new Intent(activity, MainActivity.class));
                 activity.finish();
             }
         }
@@ -79,7 +80,7 @@ public class SplashscreenLocationListener implements LocationListener {
                 }
 
                 // Finish the splashscreen and continue to the main activity
-                activity.startActivity(new Intent(activity, Main.class));
+                activity.startActivity(new Intent(activity, MainActivity.class));
                 activity.finish();
             }
         });
