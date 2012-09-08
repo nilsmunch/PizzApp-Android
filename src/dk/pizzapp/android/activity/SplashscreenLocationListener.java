@@ -11,7 +11,6 @@ import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 import dk.pizzapp.android.App;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
@@ -63,13 +62,15 @@ public class SplashscreenLocationListener implements LocationListener {
         params.put("url", "new");
         params.put("type", "android");
 
-        aQuery.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>() {
+        aQuery.ajax(url, params, String.class, new AjaxCallback<String>() {
             @Override
-            public void callback(String url, JSONObject object, AjaxStatus status) {
+            public void callback(String url, String object, AjaxStatus status) {
 
-                // Set device as registered
-                SharedPreferences.Editor editor = activity.getSharedPreferences("PizzApp", Context.MODE_PRIVATE).edit();
-                editor.putBoolean("registered", true).commit();
+                if (status.getCode() == 200) {
+                    // Set device as registered
+                    SharedPreferences.Editor editor = activity.getSharedPreferences("PizzApp", Context.MODE_PRIVATE).edit();
+                    editor.putBoolean("registered", true).commit();
+                }
 
                 // Finish the splashscreen and continue to the main activity
                 activity.startActivity(new Intent(activity, Main.class));
