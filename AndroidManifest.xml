@@ -3,33 +3,22 @@
           package="dk.pizzapp.android"
           android:versionCode="1"
           android:versionName="1.0">
-
     <uses-sdk android:minSdkVersion="10" android:targetSdkVersion="14"/>
-
+    <uses-feature android:name="android.hardware.location.network"/>
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-
-    <application android:name=".App"
-                 android:label="PizzApp"
-                 android:icon="@drawable/icon"
+    <application android:name=".App" android:label="PizzApp" android:icon="@drawable/icon"
                  android:theme="@style/Theme.Styled">
-
         <uses-library android:name="com.google.android.maps"/>
-
-        <activity android:name=".activity.Splashscreen"
-                  android:label="PizzApp"
-                  android:screenOrientation="portrait">
+        <activity android:name=".activity.Splashscreen" android:label="PizzApp" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
-        <activity android:name=".activity.Main"
-                  android:screenOrientation="portrait"/>
-        <activity android:name=".activity.Info"
-                  android:screenOrientation="portrait"/>
-        <activity android:name=".activity.Order"
-                  android:screenOrientation="portrait"/>
+        <activity android:name=".activity.Main" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.Info" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.Order" android:screenOrientation="portrait"/>
     </application>
 </manifest> 
