@@ -232,8 +232,8 @@ public class Main extends Activity {
         TextView distance;
     }
 
+    // Compares the distance differences between the restaurants
     private class DistanceComparator implements Comparator<Restaurant> {
-
         @Override
         public int compare(Restaurant restaurant, Restaurant restaurant1) {
             return Float.compare(restaurant.getDistance(), restaurant1.getDistance());
