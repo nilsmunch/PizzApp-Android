@@ -44,6 +44,10 @@ public class SplashscreenLocationListener implements LocationListener {
             // Register the device with the server
             if (!isDeviceRegistered())
                 registerDevice();
+            else {
+                activity.startActivity(new Intent(activity, Main.class));
+                activity.finish();
+            }
         }
 
         // Continue looking for a location if we got an error parsing the current one
@@ -69,7 +73,9 @@ public class SplashscreenLocationListener implements LocationListener {
                 if (status.getCode() == 200) {
                     // Set device as registered
                     SharedPreferences.Editor editor = activity.getSharedPreferences("PizzApp", Context.MODE_PRIVATE).edit();
-                    editor.putBoolean("registered", true).commit();
+                    editor.putBoolean("registered", true);
+                    editor.commit();
+                    editor.apply();
                 }
 
                 // Finish the splashscreen and continue to the main activity

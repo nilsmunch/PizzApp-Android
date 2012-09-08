@@ -10,11 +10,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import dk.pizzapp.android.App;
 import dk.pizzapp.android.R;
-import dk.pizzapp.android.model.Restaurant;
 
 public class Order extends Activity {
     private ProgressBar progressBar;
-    private Restaurant restaurant;
     private WebView webView;
 
     @Override
@@ -22,15 +20,14 @@ public class Order extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.order);
 
-        restaurant = ((App) getApplication()).visibleRestaurants.get(getIntent().getIntExtra("id", 0));
-        ((TextView) findViewById(R.id.order_name)).setText(restaurant.getName());
+        ((TextView) findViewById(R.id.order_name)).setText(App.restaurant.getName());
 
         progressBar = (ProgressBar) findViewById(R.id.order_progress);
 
         webView = (WebView) findViewById(R.id.order_webview);
         webView.setWebViewClient(new WebClient());
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.loadUrl("http://pizzapi.dk/go/" + restaurant.getId());
+        webView.loadUrl("http://pizzapi.dk/go/" + App.restaurant.getId());
     }
 
     private class WebClient extends WebViewClient {

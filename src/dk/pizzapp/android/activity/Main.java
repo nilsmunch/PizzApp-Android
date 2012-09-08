@@ -66,8 +66,8 @@ public class Main extends Activity {
     }
 
     private void initActionBar() {
-        ((TextView) findViewById(R.id.zipcode)).setText(((App) getApplication()).address.getPostalCode());
-        ((TextView) findViewById(R.id.main_description)).setText(((App) getApplication()).address.getAddressLine(0));
+        ((TextView) findViewById(R.id.zipcode)).setText(App.address.getPostalCode());
+        ((TextView) findViewById(R.id.main_description)).setText(App.address.getAddressLine(0));
     }
 
     private void initTabs() {
@@ -87,7 +87,7 @@ public class Main extends Activity {
 
         // Check the first tab, and load "all" results
         tabs.get(0).setChecked(true);
-        aQuery.progress(progressDialog).ajax("http://pizzapi.dk/zip/" + ((App) getApplication()).address.getPostalCode(), JSONObject.class, new responseCallback());
+        aQuery.progress(progressDialog).ajax("http://pizzapi.dk/zip/" + App.address.getPostalCode(), JSONObject.class, new responseCallback());
     }
 
     private class TabClickListener implements View.OnClickListener {
@@ -101,14 +101,14 @@ public class Main extends Activity {
             ((ToggleButton) view).setChecked(true);
 
             // Filter the visible results according to the tag
-            ((App) getApplication()).visibleRestaurants.clear();
+            App.visibleRestaurants.clear();
             String tag = ((ToggleButton) view).getTextOn().toString();
             if (tag.equalsIgnoreCase("all"))
-                ((App) getApplication()).visibleRestaurants.addAll(((App) getApplication()).restaurants);
+                App.visibleRestaurants.addAll(App.restaurants);
             else
-                for (Restaurant restaurant : ((App) getApplication()).restaurants) {
+                for (Restaurant restaurant : App.restaurants) {
                     if (restaurant.getKeys().contains(tag.toLowerCase()))
-                        ((App) getApplication()).visibleRestaurants.add(restaurant);
+                        App.visibleRestaurants.add(restaurant);
                 }
             arrayAdapter.notifyDataSetChanged();
             list.setSelectionAfterHeaderView();
@@ -140,7 +140,7 @@ public class Main extends Activity {
             // Calculate and set distance from current location
             float[] distances = new float[3];
             Location.distanceBetween(
-                    ((App) getApplication()).location.getLatitude(), ((App) getApplication()).location.getLongitude(),
+                    App.location.getLatitude(), App.location.getLongitude(),
                     Double.parseDouble(entry.getValue().getLatitude()), Double.parseDouble(entry.getValue().getLongitude()),
                     distances);
             entry.getValue().setDistance(distances[0]);
@@ -148,14 +148,14 @@ public class Main extends Activity {
         }
 
         // Clear existing results and add new ones
-        ((App) getApplication()).restaurants.clear();
-        ((App) getApplication()).restaurants.addAll(response.getResult().values());
+        App.restaurants.clear();
+        App.restaurants.addAll(response.getResult().values());
 
         // Sort the results according to distance
-        Collections.sort(((App) getApplication()).restaurants, new DistanceComparator());
+        Collections.sort(App.restaurants, new DistanceComparator());
 
         // Update the list with the new results
-        ((App) getApplication()).visibleRestaurants.addAll(((App) getApplication()).restaurants);
+        App.visibleRestaurants.addAll(App.restaurants);
         arrayAdapter.notifyDataSetChanged();
         list.setSelectionAfterHeaderView();
     }
@@ -193,7 +193,7 @@ public class Main extends Activity {
                 holder = (ViewHolder) convertView.getTag();
             }
 
-            Restaurant restaurant = ((App) getApplication()).visibleRestaurants.get(position);
+            Restaurant restaurant = App.visibleRestaurants.get(position);
 
             AQuery aq = new AQuery(convertView);
             holder.id = position;
@@ -211,7 +211,8 @@ public class Main extends Activity {
                 @Override
                 public void onClick(View view) {
                     ViewHolder viewHolder = (ViewHolder) view.getTag();
-                    startActivity(new Intent(Main.this, Info.class).putExtra("id", viewHolder.id));
+                    App.restaurant = App.visibleRestaurants.get(viewHolder.id);
+                    startActivity(new Intent(Main.this, Info.class));
                 }
             });
 
@@ -220,7 +221,7 @@ public class Main extends Activity {
 
         @Override
         public int getCount() {
-            return ((App) getApplication()).visibleRestaurants.size();
+            return App.visibleRestaurants.size();
         }
     }
 

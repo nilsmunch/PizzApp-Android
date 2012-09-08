@@ -16,10 +16,8 @@ import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import dk.pizzapp.android.App;
 import dk.pizzapp.android.R;
-import dk.pizzapp.android.model.Restaurant;
 
 public class Info extends MapActivity {
-    private Restaurant restaurant;
     private MapView mapView;
 
     @Override
@@ -27,19 +25,18 @@ public class Info extends MapActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.info);
 
-        // Get the restaurant and mapview
-        restaurant = ((App) getApplication()).visibleRestaurants.get(getIntent().getIntExtra("id", 0));
+        // Get the mapview
         mapView = (MapView) findViewById(R.id.info_map);
 
         // Set the text fields
-        ((TextView) findViewById(R.id.info_name)).setText(restaurant.getName());
-        ((TextView) findViewById(R.id.info_address)).setText(restaurant.getAddress() + ", " + restaurant.getCity());
+        ((TextView) findViewById(R.id.info_name)).setText(App.restaurant.getName());
+        ((TextView) findViewById(R.id.info_address)).setText(App.restaurant.getAddress() + ", " + App.restaurant.getCity());
 
         // Set the map center and zoom to the restaurants locations
         mapView.getController().setCenter(
                 new GeoPoint(
-                        (int) (Double.parseDouble(restaurant.getLatitude()) * 1E6),
-                        (int) (Double.parseDouble(restaurant.getLongitude()) * 1E6))
+                        (int) (Double.parseDouble(App.restaurant.getLatitude()) * 1E6),
+                        (int) (Double.parseDouble(App.restaurant.getLongitude()) * 1E6))
         );
         mapView.getController().setZoom(18);
 
@@ -58,8 +55,8 @@ public class Info extends MapActivity {
 
             Point screenPoint = new Point();
             mapView.getProjection().toPixels(new GeoPoint(
-                    (int) (Double.parseDouble(restaurant.getLatitude()) * 1E6),
-                    (int) (Double.parseDouble(restaurant.getLongitude()) * 1E6))
+                    (int) (Double.parseDouble(App.restaurant.getLatitude()) * 1E6),
+                    (int) (Double.parseDouble(App.restaurant.getLongitude()) * 1E6))
                     , screenPoint);
 
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.marker);
@@ -76,7 +73,7 @@ public class Info extends MapActivity {
 
     public boolean isAppInstalled(String uri) {
         PackageManager pm = getPackageManager();
-        boolean app_installed = false;
+        boolean app_installed;
         try {
             pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
             app_installed = true;
@@ -88,7 +85,7 @@ public class Info extends MapActivity {
 
     public void findRoute(View v) {
         Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-                Uri.parse("geo:0,0?q=" + restaurant.getAddress() + ", " + restaurant.getCity()));
+                Uri.parse("geo:0,0?q=" + App.restaurant.getAddress() + ", " + App.restaurant.getCity()));
         if (isAppInstalled("com.google.android.apps.maps"))
             intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
         startActivity(intent);
