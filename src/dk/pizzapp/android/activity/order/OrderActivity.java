@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
-import android.widget.Toast;
 import dk.pizzapp.android.App;
 import dk.pizzapp.android.R;
 
@@ -37,8 +36,6 @@ public class OrderActivity extends Activity {
 
         @Override
         public void onPageFinished(WebView view, String url) {
-
-            Toast.makeText(OrderActivity.this, url, Toast.LENGTH_SHORT).show();
 
             // Return to info page if '/area' is in the URL
             if (url.contains("/area")) {

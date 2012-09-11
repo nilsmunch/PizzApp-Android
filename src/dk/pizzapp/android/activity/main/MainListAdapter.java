@@ -56,7 +56,7 @@ public class MainListAdapter extends ArrayAdapter<Response> {
         holder.id = position;
         aq.id(holder.name).text(restaurant.getName());
         aq.id(holder.address).text(restaurant.getAddress());
-        aq.id(holder.icon).image("http://pizzapi.dk/display/" + restaurant.getId(), true, true, 0, R.drawable.icon, aq.getCachedImage(R.drawable.icon), AQuery.FADE_IN_NETWORK);
+        aq.id(holder.icon).image("http://pizzapi.dk/display/" + restaurant.getId(), true, false, 0, R.drawable.icon, aq.getCachedImage(R.drawable.icon), AQuery.FADE_IN_NETWORK);
 
         if ((int) restaurant.getDistance() < 1000)
             aq.id(holder.distance).text((int) restaurant.getDistance() + " m");

@@ -106,6 +106,7 @@ public class InfoActivity extends MapActivity {
     }
 
     public void findRoute() {
+        // TODO Open browser if google maps isn't installed
         Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
                 Uri.parse("geo:0,0?q=" + App.restaurant.getAddress() + ", " + App.restaurant.getCity()));
         if (isAppInstalled("com.google.android.apps.maps"))
