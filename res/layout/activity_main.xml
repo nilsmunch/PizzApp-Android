@@ -34,13 +34,13 @@
             android:background="#000"
             android:gravity="center"
             android:textColor="#FFF"
-            android:text="Address"/>
+            android:text="Description"/>
     <ListView
             android:id="@+id/main_list"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:background="#FFF"/>
+            android:background="#999"/>
     <View
             android:layout_width="fill_parent"
             android:layout_height="3dp"

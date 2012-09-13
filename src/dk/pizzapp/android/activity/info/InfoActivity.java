@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 import com.google.android.maps.GeoPoint;
@@ -40,7 +41,7 @@ public class InfoActivity extends MapActivity {
         findViewById(R.id.info_route).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                findRoute();
+                doNavigate();
             }
         });
         findViewById(R.id.info_order).setOnClickListener(new View.OnClickListener() {
@@ -53,16 +54,33 @@ public class InfoActivity extends MapActivity {
 
     private void initMap() {
 
-        // Get the mapview
         mapView = (MapView) findViewById(R.id.info_map);
-
-        // Set the map center and zoom to the restaurants locations
         mapView.getController().setCenter(new GeoPoint(
                 (int) (Double.parseDouble(App.restaurant.getLatitude()) * 1E6),
                 (int) (Double.parseDouble(App.restaurant.getLongitude()) * 1E6)));
         mapView.getController().setZoom(18);
+        mapView.setOnTouchListener(new View.OnTouchListener() {
+            float x
+                    ,
+                    y;
 
-        // Add a map marker
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    x = motionEvent.getX();
+                    y = motionEvent.getY();
+                } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    if (Math.abs(motionEvent.getX() - x) < 10 && Math.abs(motionEvent.getY() - y) < 10) {
+                        mapView.getController().animateTo(new GeoPoint(
+                                (int) (Double.parseDouble(App.restaurant.getLatitude()) * 1E6),
+                                (int) (Double.parseDouble(App.restaurant.getLongitude()) * 1E6)));
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+
         MapOverlay mapOverlay = new MapOverlay();
         mapView.getOverlays().clear();
         mapView.getOverlays().add(mapOverlay);
@@ -84,8 +102,6 @@ public class InfoActivity extends MapActivity {
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.map_marker);
             canvas.drawBitmap(bitmap, screenPoint.x, screenPoint.y - bitmap.getHeight(), null);
         }
-
-
     }
 
     @Override
@@ -105,16 +121,21 @@ public class InfoActivity extends MapActivity {
         return app_installed;
     }
 
-    public void findRoute() {
-        // TODO Open browser if google maps isn't installed
+    public void doNavigate() {
+        String saddr = App.address.getThoroughfare() + " " + App.address.getSubThoroughfare() + ", " + App.address.getLocality();
+        String daddr = App.restaurant.getAddress() + ", " + App.restaurant.getCity();
         Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-                Uri.parse("geo:0,0?q=" + App.restaurant.getAddress() + ", " + App.restaurant.getCity()));
-        if (isAppInstalled("com.google.android.apps.maps"))
-            intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+                Uri.parse("http://maps.google.com/maps" +
+                        "?saddr=" + saddr.replace(" ", "+") +
+                        "&daddr=" + daddr.replace(" ", "+")));
         startActivity(intent);
     }
 
     public void doOrder() {
         startActivity(new Intent(InfoActivity.this, OrderActivity.class));
+    }
+
+    public void goBack(View v) {
+        finish();
     }
 }

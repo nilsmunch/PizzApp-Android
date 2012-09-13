@@ -2,6 +2,7 @@ package dk.pizzapp.android.activity.order;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
@@ -21,26 +22,29 @@ public class OrderActivity extends Activity {
         webView = (WebView) findViewById(R.id.order_webview);
         webView.setWebViewClient(new WebClient());
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.loadUrl("http://pizzapi.dk/go/" + App.restaurant.getId());
+        webView.loadUrl("http://www.just-eat.dk/area/" + App.address.getPostalCode());
     }
 
     private class WebClient extends WebViewClient {
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-
-            // Load the requested URL in our webview
-            webView.loadUrl(url);
+            if (url.equalsIgnoreCase("http://www.just-eat.dk/"))
+                finish();
+            else
+                webView.loadUrl(url);
             return true;
         }
 
         @Override
         public void onPageFinished(WebView view, String url) {
-
-            // Return to info page if '/area' is in the URL
             if (url.contains("/area")) {
-                finish();
+                webView.loadUrl("http://pizzapi.dk/go/" + App.restaurant.getId());
             }
         }
+    }
+
+    public void goBack(View v) {
+        finish();
     }
 }

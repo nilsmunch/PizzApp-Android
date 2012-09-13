@@ -11,10 +11,9 @@ import com.androidquery.AQuery;
 import dk.pizzapp.android.App;
 import dk.pizzapp.android.R;
 import dk.pizzapp.android.activity.info.InfoActivity;
-import dk.pizzapp.android.data.Response;
-import dk.pizzapp.android.data.Restaurant;
+import dk.pizzapp.android.api.Response;
 
-public class MainListAdapter extends ArrayAdapter<Response> {
+public class MainListAdapter extends ArrayAdapter<Response.Restaurant> {
     private Activity activity;
 
     public MainListAdapter(Activity activity) {
@@ -51,12 +50,12 @@ public class MainListAdapter extends ArrayAdapter<Response> {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        Restaurant restaurant = App.visibleRestaurants.get(position);
+        Response.Restaurant restaurant = App.visibleRestaurants.get(position);
         AQuery aq = new AQuery(convertView);
         holder.id = position;
         aq.id(holder.name).text(restaurant.getName());
         aq.id(holder.address).text(restaurant.getAddress());
-        aq.id(holder.icon).image("http://pizzapi.dk/display/" + restaurant.getId(), true, false, 0, R.drawable.icon, aq.getCachedImage(R.drawable.icon), AQuery.FADE_IN_NETWORK);
+        aq.id(holder.icon).image("http://pizzapi.dk/display/" + restaurant.getId(), true, false, 0, R.drawable.icon_placeholder, aq.getCachedImage(R.drawable.icon_placeholder), AQuery.FADE_IN_NETWORK);
 
         if ((int) restaurant.getDistance() < 1000)
             aq.id(holder.distance).text((int) restaurant.getDistance() + " m");

@@ -59,8 +59,8 @@ public class SplashscreenActivity extends Activity {
         }
 
         // Register cell-tower location updates with the Location Manager
-        locationManager.requestLocationUpdates(
-                LocationManager.NETWORK_PROVIDER, 500, 1000, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 500, 1000, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 1000, locationListener);
     }
 
     @Override

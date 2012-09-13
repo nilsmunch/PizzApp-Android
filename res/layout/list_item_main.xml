@@ -3,47 +3,42 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
-              android:padding="10dp">
-    <View
-            android:id="@+id/list_item_id"
-            android:layout_width="0dp"
-            android:layout_height="0dp"/>
-    <ImageView
-            android:id="@+id/list_item_icon"
-            android:layout_width="46dp"
-            android:layout_height="46dp"/>
-    <LinearLayout
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="46dp"
-            android:paddingLeft="5dp"
-            android:orientation="vertical">
-        <TextView
-                android:id="@+id/list_item_name"
-                android:layout_width="fill_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.5"
-                android:gravity="bottom"
-                android:singleLine="true"
-                android:textColor="#ef5722"
-                android:textStyle="bold"
-                android:textSize="18dp"
-                android:text="Name"/>
-        <TextView
-                android:id="@+id/list_item_address"
-                android:layout_width="fill_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.5"
-                android:gravity="top"
-                android:singleLine="true"
-                android:textColor="#000"
-                android:text="Address"/>
+              android:padding="10dp"
+              android:background="#FFF">
+    <View android:id="@+id/list_item_id"
+          android:layout_width="0dp"
+          android:layout_height="0dp"/>
+    <ImageView android:id="@+id/list_item_icon"
+               android:layout_width="46dp"
+               android:layout_height="46dp"/>
+    <LinearLayout android:layout_width="0dp"
+                  android:layout_weight="1"
+                  android:layout_height="46dp"
+                  android:paddingLeft="5dp"
+                  android:orientation="vertical">
+        <TextView android:id="@+id/list_item_name"
+                  android:layout_width="fill_parent"
+                  android:layout_height="0dp"
+                  android:layout_weight="0.5"
+                  android:gravity="bottom"
+                  android:singleLine="true"
+                  android:textColor="#ef5722"
+                  android:textStyle="bold"
+                  android:textSize="18dp"
+                  android:text="Name"/>
+        <TextView android:id="@+id/list_item_address"
+                  android:layout_width="fill_parent"
+                  android:layout_height="0dp"
+                  android:layout_weight="0.5"
+                  android:gravity="top"
+                  android:singleLine="true"
+                  android:textColor="#000"
+                  android:text="Address"/>
     </LinearLayout>
-    <TextView
-            android:id="@+id/list_item_distance"
-            android:layout_width="wrap_content"
-            android:layout_height="46dp"
-            android:gravity="bottom"
-            android:textColor="#000"
-            android:text="10m"/>
+    <TextView android:id="@+id/list_item_distance"
+              android:layout_width="wrap_content"
+              android:layout_height="46dp"
+              android:gravity="bottom"
+              android:textColor="#000"
+              android:text="10m"/>
 </LinearLayout>

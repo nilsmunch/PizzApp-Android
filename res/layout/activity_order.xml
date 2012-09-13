@@ -13,6 +13,7 @@
                 android:layout_height="46dp"
                 android:layout_marginLeft="5dp"
                 android:padding="5dp"
+                android:onClick="goBack"
                 android:src="@drawable/icon"/>
         <TextView
                 android:id="@+id/order_name"

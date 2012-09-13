@@ -1,11 +1,17 @@
 package dk.pizzapp.android.activity.main;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ListView;
@@ -14,13 +20,11 @@ import android.widget.ToggleButton;
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.pizzapp.android.App;
 import dk.pizzapp.android.R;
-import dk.pizzapp.android.data.Response;
-import dk.pizzapp.android.data.Restaurant;
+import dk.pizzapp.android.api.PizzaService;
+import dk.pizzapp.android.api.Response;
 import dk.pizzapp.android.util.DistanceComparator;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,11 +46,24 @@ public class MainActivity extends Activity {
         initProgressDialog();
         initTabs();
         initList();
+        loadResults();
     }
 
     private void initActionBar() {
-        ((TextView) findViewById(R.id.zipcode)).setText(App.address.getPostalCode());
-        ((TextView) findViewById(R.id.main_description)).setText(App.address.getAddressLine(0));
+        ((TextView) findViewById(R.id.zipcode)).setText(App.address.getSubLocality());
+
+        Spannable span1 = new SpannableString("Åbne");
+        Spannable span2 = new SpannableString(" restauranter der i øjeblikket kan levere mad til ");
+        Spannable span3 = new SpannableString(App.address.getThoroughfare());
+        Spannable span4 = new SpannableString(" og omegn.");
+
+        span1.setSpan(new ForegroundColorSpan(Color.parseColor("#ea4d22")), 0, span1.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        span3.setSpan(new ForegroundColorSpan(Color.parseColor("#ea4d22")), 0, span3.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        span1.setSpan(new StyleSpan(Typeface.BOLD), 0, span1.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        span3.setSpan(new StyleSpan(Typeface.BOLD), 0, span3.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        ((TextView) findViewById(R.id.main_description)).setText(TextUtils.concat(span1, span2, span3, span4));
     }
 
     private void initProgressDialog() {
@@ -71,9 +88,8 @@ public class MainActivity extends Activity {
             tab.setOnClickListener(new TabClickListener());
         }
 
-        // Check the first tab, and load initial results
+        // Select first tab
         tabs.get(0).setChecked(true);
-        aQuery.progress(progressDialog).ajax("http://pizzapi.dk/zip/" + App.address.getPostalCode(), JSONObject.class, new responseCallback());
     }
 
     private void initList() {
@@ -93,6 +109,31 @@ public class MainActivity extends Activity {
         aQuery.id(list).adapter(listAdapter);
     }
 
+    private void loadResults() {
+        PizzaService.getInstance(getApplication()).getRestaurants(App.address.getPostalCode(), new responseCallback());
+    }
+
+    private class responseCallback extends AjaxCallback<Response> {
+        @Override
+        public void callback(String url, Response response, AjaxStatus status) {
+            for (Map.Entry<String, Response.Restaurant> entry : response.getResult().entrySet()) {
+                entry.getValue().setId(entry.getKey());
+                float[] distances = new float[3];
+                Location.distanceBetween(
+                        App.location.getLatitude(), App.location.getLongitude(),
+                        Double.parseDouble(entry.getValue().getLatitude()), Double.parseDouble(entry.getValue().getLongitude()),
+                        distances);
+                entry.getValue().setDistance(distances[0]);
+            }
+            App.restaurants.clear();
+            App.restaurants.addAll(response.getResult().values());
+            Collections.sort(App.restaurants, new DistanceComparator());
+            App.visibleRestaurants.addAll(App.restaurants);
+            listAdapter.notifyDataSetChanged();
+            list.setSelectionAfterHeaderView();
+        }
+    }
+
     private class TabClickListener implements View.OnClickListener {
 
         @Override
@@ -109,67 +150,12 @@ public class MainActivity extends Activity {
             if (tag.equalsIgnoreCase("all"))
                 App.visibleRestaurants.addAll(App.restaurants);
             else
-                for (Restaurant restaurant : App.restaurants) {
-                    if (restaurant.getKeys().contains(tag.toLowerCase()))
+                for (Response.Restaurant restaurant : App.restaurants) {
+                    if (restaurant.getTags().contains(tag.toLowerCase()))
                         App.visibleRestaurants.add(restaurant);
                 }
             listAdapter.notifyDataSetChanged();
             list.setSelectionAfterHeaderView();
         }
-    }
-
-    private class responseCallback extends AjaxCallback<JSONObject> {
-        @Override
-        public void callback(String url, JSONObject object, AjaxStatus status) {
-            if (object == null)
-                showAlert("", status.getMessage());
-            else {
-                try {
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    handleResponse(objectMapper.readValue(object.toString(), Response.class));
-                } catch (Exception e) {
-                    showAlert("", e.getMessage());
-                }
-            }
-        }
-    }
-
-    private void handleResponse(Response response) {
-        for (Map.Entry<String, Restaurant> entry : response.getResult().entrySet()) {
-
-            // Set the id for the restaurant
-            entry.getValue().setId(entry.getKey());
-
-            // Calculate and set distance from current location
-            float[] distances = new float[3];
-            Location.distanceBetween(
-                    App.location.getLatitude(), App.location.getLongitude(),
-                    Double.parseDouble(entry.getValue().getLatitude()), Double.parseDouble(entry.getValue().getLongitude()),
-                    distances);
-            entry.getValue().setDistance(distances[0]);
-
-        }
-
-        // Clear existing results and add new ones
-        App.restaurants.clear();
-        App.restaurants.addAll(response.getResult().values());
-
-        // Sort the results according to distance
-        Collections.sort(App.restaurants, new DistanceComparator());
-
-        // Update the list with the new results
-        App.visibleRestaurants.addAll(App.restaurants);
-        listAdapter.notifyDataSetChanged();
-        list.setSelectionAfterHeaderView();
-    }
-
-    private void showAlert(String title, String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(title).setMessage(message).setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-            }
-        }).show();
     }
 }
