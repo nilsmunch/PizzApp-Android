@@ -71,6 +71,12 @@ public class InfoActivity extends MapActivity {
                     y = motionEvent.getY();
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                     if (Math.abs(motionEvent.getX() - x) < 10 && Math.abs(motionEvent.getY() - y) < 10) {
+                        while (mapView.getZoomLevel() != 18) {
+                            if (mapView.getZoomLevel() < 18)
+                                mapView.getController().zoomIn();
+                            else
+                                mapView.getController().zoomOut();
+                        }
                         mapView.getController().animateTo(new GeoPoint(
                                 (int) (Double.parseDouble(App.restaurant.getLatitude()) * 1E6),
                                 (int) (Double.parseDouble(App.restaurant.getLongitude()) * 1E6)));
