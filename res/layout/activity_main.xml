@@ -30,7 +30,7 @@
             android:id="@+id/main_description"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:padding="20dp"
+            android:padding="15dp"
             android:background="#000"
             android:gravity="center"
             android:textColor="#FFF"

@@ -51,19 +51,7 @@ public class MainActivity extends Activity {
 
     private void initActionBar() {
         ((TextView) findViewById(R.id.zipcode)).setText(App.address.getSubLocality());
-
-        Spannable span1 = new SpannableString("Åbne");
-        Spannable span2 = new SpannableString(" restauranter der i øjeblikket kan levere mad til ");
-        Spannable span3 = new SpannableString(App.address.getThoroughfare());
-        Spannable span4 = new SpannableString(" og omegn.");
-
-        span1.setSpan(new ForegroundColorSpan(Color.parseColor("#ea4d22")), 0, span1.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        span3.setSpan(new ForegroundColorSpan(Color.parseColor("#ea4d22")), 0, span3.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        span1.setSpan(new StyleSpan(Typeface.BOLD), 0, span1.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        span3.setSpan(new StyleSpan(Typeface.BOLD), 0, span3.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        ((TextView) findViewById(R.id.main_description)).setText(TextUtils.concat(span1, span2, span3, span4));
+        setDescription();
     }
 
     private void initProgressDialog() {
@@ -149,13 +137,49 @@ public class MainActivity extends Activity {
             String tag = ((ToggleButton) view).getTextOn().toString();
             if (tag.equalsIgnoreCase("all"))
                 App.visibleRestaurants.addAll(App.restaurants);
-            else
+            else {
+                setDescription(tag.toLowerCase());
                 for (Response.Restaurant restaurant : App.restaurants) {
                     if (restaurant.getTags().contains(tag.toLowerCase()))
                         App.visibleRestaurants.add(restaurant);
                 }
+            }
             listAdapter.notifyDataSetChanged();
             list.setSelectionAfterHeaderView();
         }
+    }
+
+    private void setDescription() {
+        Spannable span1 = new SpannableString("Åbne");
+        Spannable span2 = new SpannableString(" restauranter der i øjeblikket kan levere mad til ");
+        Spannable span3 = new SpannableString(App.address.getThoroughfare());
+        Spannable span4 = new SpannableString(" og omegn.");
+
+        span1.setSpan(new ForegroundColorSpan(Color.parseColor("#ea4d22")), 0, span1.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        span3.setSpan(new ForegroundColorSpan(Color.parseColor("#ea4d22")), 0, span3.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        span1.setSpan(new StyleSpan(Typeface.BOLD), 0, span1.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        span3.setSpan(new StyleSpan(Typeface.BOLD), 0, span3.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        ((TextView) findViewById(R.id.main_description)).setText(TextUtils.concat(span1, span2, span3, span4));
+    }
+
+    private void setDescription(String type) {
+        Spannable span1 = new SpannableString("Åbne");
+        Spannable span2 = new SpannableString(" restauranter der serverer ");
+        Spannable span3 = new SpannableString(type);
+        Spannable span4 = new SpannableString(" og i øjeblikket kan levere mad til ");
+        Spannable span5 = new SpannableString(App.address.getThoroughfare());
+        Spannable span6 = new SpannableString(" og omegn.");
+
+        span1.setSpan(new ForegroundColorSpan(Color.parseColor("#ea4d22")), 0, span1.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        span3.setSpan(new ForegroundColorSpan(Color.parseColor("#ea4d22")), 0, span3.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        span5.setSpan(new ForegroundColorSpan(Color.parseColor("#ea4d22")), 0, span5.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        span1.setSpan(new StyleSpan(Typeface.BOLD), 0, span1.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        span3.setSpan(new StyleSpan(Typeface.BOLD), 0, span3.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        span5.setSpan(new StyleSpan(Typeface.BOLD), 0, span5.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        ((TextView) findViewById(R.id.main_description)).setText(TextUtils.concat(span1, span2, span3, span4, span5, span6));
     }
 }
