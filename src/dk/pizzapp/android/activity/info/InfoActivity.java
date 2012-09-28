@@ -1,7 +1,6 @@
 package dk.pizzapp.android.activity.info;
 
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -32,12 +31,9 @@ public class InfoActivity extends MapActivity {
     }
 
     private void initUi() {
-
-        // Set the text fields
         ((TextView) findViewById(R.id.info_name)).setText(App.restaurant.getName());
         ((TextView) findViewById(R.id.info_address)).setText(App.restaurant.getAddress() + ", " + App.restaurant.getCity());
 
-        // Set the button listeners
         findViewById(R.id.info_route).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -53,19 +49,20 @@ public class InfoActivity extends MapActivity {
     }
 
     private void initMap() {
-
         mapView = (MapView) findViewById(R.id.info_map);
+
         mapView.getController().setCenter(new GeoPoint(
                 (int) (Double.parseDouble(App.restaurant.getLatitude()) * 1E6),
                 (int) (Double.parseDouble(App.restaurant.getLongitude()) * 1E6)));
         mapView.getController().setZoom(18);
+
         mapView.setOnTouchListener(new View.OnTouchListener() {
-            float x
-                    ,
-                    y;
+            float x;
+            float y;
 
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
+
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                     x = motionEvent.getX();
                     y = motionEvent.getY();
@@ -113,18 +110,6 @@ public class InfoActivity extends MapActivity {
     @Override
     protected boolean isRouteDisplayed() {
         return false;
-    }
-
-    public boolean isAppInstalled(String uri) {
-        PackageManager pm = getPackageManager();
-        boolean app_installed;
-        try {
-            pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
-            app_installed = true;
-        } catch (PackageManager.NameNotFoundException e) {
-            app_installed = false;
-        }
-        return app_installed;
     }
 
     public void doNavigate() {

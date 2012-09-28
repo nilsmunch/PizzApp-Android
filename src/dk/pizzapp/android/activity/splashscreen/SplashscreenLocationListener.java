@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class SplashscreenLocationListener implements LocationListener {
+
     private Activity activity;
     private LocationManager locationManager;
 

@@ -7,8 +7,10 @@ import java.util.HashMap;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Response {
+
     @JsonProperty("response")
     private String response;
+
     @JsonProperty("result")
     private HashMap<String, Restaurant> result;
 
@@ -22,22 +24,32 @@ public class Response {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Restaurant {
+
         private String id;
+
         @JsonProperty("name")
         private String name;
+
         @JsonProperty("street")
         private String address;
+
         @JsonProperty("city")
         private String city;
+
         @JsonProperty("lat")
         private String latitude;
+
         @JsonProperty("long")
         private String longitude;
+
         private float distance;
+
         @JsonProperty("keys")
         private String tags;
+
         @JsonProperty("phone")
         private String phone;
+
         @JsonProperty("del_price")
         private String deliveryPrice;
 

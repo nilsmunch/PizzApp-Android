@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PizzaService {
+
     private static PizzaService instance;
     private AQuery androidQuery;
 
@@ -26,13 +27,12 @@ public class PizzaService {
     }
 
     public void registerDevice(final String uuid, final String url, final String type) {
-        Map<String, Object> params = new HashMap<String, Object>() {
-            {
-                put("uuid", uuid);
-                put("url", url);
-                put("type", type);
-            }
-        };
+
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("uuid", uuid);
+        params.put("url", url);
+        params.put("type", type);
+
         androidQuery.ajax("http://affiliate.pizzapp.dk/register.php", params, String.class, new AjaxCallback<String>());
     }
 }

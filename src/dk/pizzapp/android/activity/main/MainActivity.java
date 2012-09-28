@@ -50,7 +50,14 @@ public class MainActivity extends Activity {
     }
 
     private void initActionBar() {
-        ((TextView) findViewById(R.id.zipcode)).setText(App.address.getSubLocality());
+        if (App.address.getSubLocality() != null)
+            ((TextView) findViewById(R.id.zipcode)).setText(App.address.getSubLocality());
+        else if (App.address.getLocality() != null)
+            ((TextView) findViewById(R.id.zipcode)).setText(App.address.getLocality());
+        else if (App.address.getAdminArea() != null)
+            ((TextView) findViewById(R.id.zipcode)).setText(App.address.getAdminArea());
+        else
+            ((TextView) findViewById(R.id.zipcode)).setText(App.address.getCountryName());
         setDescription();
     }
 
@@ -62,8 +69,6 @@ public class MainActivity extends Activity {
     }
 
     private void initTabs() {
-
-        // Find all views and add them to tab-list
         tabs.add((ToggleButton) findViewById(R.id.main_tab_all));
         tabs.add((ToggleButton) findViewById(R.id.main_tab_pizza));
         tabs.add((ToggleButton) findViewById(R.id.main_tab_sushi));
@@ -71,18 +76,17 @@ public class MainActivity extends Activity {
         tabs.add((ToggleButton) findViewById(R.id.main_tab_pasta));
         tabs.add((ToggleButton) findViewById(R.id.main_tab_sandwich));
 
-        // Set their onClick listener
         for (ToggleButton tab : tabs) {
             tab.setOnClickListener(new TabClickListener());
         }
 
-        // Select first tab
         tabs.get(0).setChecked(true);
     }
 
     private void initList() {
         list = (ListView) findViewById(R.id.main_list);
         listAdapter = new MainListAdapter(this);
+
         aQuery.id(list).scrolled(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView absListView, int i) {
@@ -94,6 +98,7 @@ public class MainActivity extends Activity {
 
             }
         });
+
         aQuery.id(list).adapter(listAdapter);
     }
 
@@ -104,6 +109,7 @@ public class MainActivity extends Activity {
     private class responseCallback extends AjaxCallback<Response> {
         @Override
         public void callback(String url, Response response, AjaxStatus status) {
+
             for (Map.Entry<String, Response.Restaurant> entry : response.getResult().entrySet()) {
                 entry.getValue().setId(entry.getKey());
                 float[] distances = new float[3];
@@ -113,10 +119,14 @@ public class MainActivity extends Activity {
                         distances);
                 entry.getValue().setDistance(distances[0]);
             }
+
             App.restaurants.clear();
             App.restaurants.addAll(response.getResult().values());
+
             Collections.sort(App.restaurants, new DistanceComparator());
+
             App.visibleRestaurants.addAll(App.restaurants);
+
             listAdapter.notifyDataSetChanged();
             list.setSelectionAfterHeaderView();
         }
@@ -127,13 +137,12 @@ public class MainActivity extends Activity {
         @Override
         public void onClick(View view) {
 
-            // Toggle all tabs to off, and set clicked one to on.
             for (ToggleButton tab : tabs)
                 tab.setChecked(false);
             ((ToggleButton) view).setChecked(true);
 
-            // Filter the visible results according to the tag
             App.visibleRestaurants.clear();
+
             String tag = ((ToggleButton) view).getTextOn().toString();
             if (tag.equalsIgnoreCase("all"))
                 App.visibleRestaurants.addAll(App.restaurants);
@@ -144,6 +153,7 @@ public class MainActivity extends Activity {
                         App.visibleRestaurants.add(restaurant);
                 }
             }
+
             listAdapter.notifyDataSetChanged();
             list.setSelectionAfterHeaderView();
         }
